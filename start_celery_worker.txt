@@ -1,0 +1,10 @@
+cd /home/Pesha221/machine/alx_travel_app_0x03
+
+# Start Celery worker
+celery -A alx_travel_app_0x03 worker --loglevel=info
+
+# For production with concurrency
+celery -A alx_travel_app_0x03 worker --loglevel=info --concurrency=4
+
+# For development with autoreload
+celery -A alx_travel_app_0x03 worker --loglevel=info --autoreload

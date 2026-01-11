@@ -1,0 +1,21 @@
+# Ubuntu/Debian
+sudo apt update
+sudo apt install -y rabbitmq-server
+
+# Start RabbitMQ service
+sudo systemctl start rabbitmq-server
+sudo systemctl enable rabbitmq-server
+sudo systemctl status rabbitmq-server
+
+# Create a user (optional, guest is default)
+sudo rabbitmqctl add_user alx_user alx_password
+sudo rabbitmqctl set_user_tags alx_user administrator
+sudo rabbitmqctl set_permissions -p / alx_user ".*" ".*" ".*"
+
+# For macOS
+# brew install rabbitmq
+# brew services start rabbitmq
+
+# For CentOS/RHEL
+# sudo yum install rabbitmq-server
+# sudo systemctl start rabbitmq-server

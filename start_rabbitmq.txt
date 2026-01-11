@@ -1,0 +1,5 @@
+# Ensure RabbitMQ is running
+sudo systemctl status rabbitmq-server
+
+# If not running, start it
+sudo systemctl start rabbitmq-server

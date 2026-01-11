@@ -1,0 +1,8 @@
+# Check if RabbitMQ is running
+sudo rabbitmqctl status
+
+# List users
+sudo rabbitmqctl list_users
+
+# List queues (after starting Celery)
+sudo rabbitmqctl list_queues

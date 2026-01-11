@@ -1,0 +1,12 @@
+# Create a booking via API
+curl -X POST http://localhost:8000/api/bookings/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{
+    "listing": 1,
+    "check_in_date": "2025-12-25",
+    "check_out_date": "2025-12-30",
+    "number_of_guests": 2,
+    "total_price": "500.00"
+  }'
+  

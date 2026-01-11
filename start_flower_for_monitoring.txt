@@ -1,0 +1,3 @@
+# In another terminal
+cd /home/Pesha221/machine/alx_travel_app_0x03
+celery -A alx_travel_app_0x03 flower --port=5555

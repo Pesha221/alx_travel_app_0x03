@@ -1,0 +1,3 @@
+# In a new terminal
+cd /home/Pesha221/machine/alx_travel_app_0x03
+celery -A alx_travel_app_0x03 beat --loglevel=info
