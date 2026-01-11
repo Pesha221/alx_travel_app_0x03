@@ -10,8 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
+import sys
+# Adds the parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import environ
 from pathlib import Path
+
+from celery_beat_schedule import CELERY_BEAT_SCHEDULE
 
 # inti django environ
 env = environ.Env(
@@ -20,6 +25,8 @@ env = environ.Env(
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'alx_travel_app.settings')
 
 # read .env file
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
@@ -49,11 +56,16 @@ INSTALLED_APPS = [
 
     # third party apps
     "rest_framework",
-    "corsgeaders",
+    "corsheaders",
     "drf-yasg",
-    "listings",
+    "django_celery_results",
+    "django_celery_beats",
+
     # my apps goes here..
+    "alx_travel_app",
+    "listings",
 ]
+
 
 MIDDLEWARE = [
     # third party middleware
@@ -69,7 +81,9 @@ MIDDLEWARE = [
     
 ]
 
-ROOT_URLCONF = "alx_travel_app.urls"
+
+ROOT_URLCONF = 'alx_travel_app.urls'
+WSGI_APPLICATION = 'alx_travel_app.wsgi.application'
 
 TEMPLATES = [
     {
@@ -86,41 +100,19 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "alx_travel_app.wsgi.application"
 
 
-# Database
+# Database Config
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
 
 DATABASES = {
-    "default": {
-        "engine": {
-            "ENGINE": "django.db.backend.mysql",
-            "NAME": env("DB_NAME"),
-            "USER": env("USER"),
-            "PASSWORD": env("PASSWORD"),
-            "HOST": env("DB_HOST", default="localhost"),
-            "PORT": env("DB_PORT", default="3306"),
-            "OPTIONS": {
-                "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-                "charset": "utf8mb4"
-            },
-        }
-
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
-# Optional: if you used DATABASE_URL in .env instead:
-# DATABASES = {
-#     'default': env.db('DATABASE_URL', default='mysql://user:pass@localhost:3306/dbname')
-# }
 
 # REST framework default settings
 REST_FRAMEWORK = {
@@ -128,7 +120,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.AllowAny"
         ], # change in prod
     "DEFAULT_AUTHENTICATION_CLASSES":[
-        "rest_framework.authentication.SessionAuthentication"
+        "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication"
         ],
     # other settings
@@ -136,12 +128,12 @@ REST_FRAMEWORK = {
 
 # CORS configurations
 # option 1: allow from specific origin from .env (comma separated)
-cors_origins = env.list("CORS_ALLOWED_ORIGINS", default=[])
-if cors-origin:
-    CORS_ALLOWED_ORIGINS = cors_origin    
-else:
-    # option 2: open to all origins (not recommended in prod)
-    CORS_ALLOWED_ORIGINS = env.bool("CORS_ALLOWED_ORIGINS", default=False)
+# cors_origins = env.list("CORS_ALLOWED_ORIGINS", default=[])
+# if cors-origin:
+#     CORS_ALLOWED_ORIGINS = cors_origin    
+# else:
+#     # option 2: open to all origins (not recommended in prod)
+#     CORS_ALLOWED_ORIGINS = env.bool("CORS_ALLOWED_ORIGINS", default=False)
 
 
 # Password validation
@@ -184,3 +176,31 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Celery Configuration
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'  # RabbitMQ
+CELERY_RESULT_BACKEND = 'django-db'  # Store results in Django database
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
+CELERY_RESULT_EXPIRES = 3600  # 1 hour
+
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Or your email provider
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your-email@gmail.com'  # Use environment variable in production
+EMAIL_HOST_PASSWORD = 'your-app-password'  # Use environment variable in production
+DEFAULT_FROM_EMAIL = 'noreply@alxtravelapp.com'
+EMAIL_TIMEOUT = 30
+
+# For development/testing (console backend)
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Optional: For file-based email in development
+# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+# EMAIL_FILE_PATH = '/tmp/app-emai
